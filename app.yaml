@@ -1,0 +1,14 @@
+application: budapestcycletrack
+version: 1
+runtime: python
+api_version: 1
+
+handlers:
+- url: /upload
+  script: upload.py
+
+- url: /stats
+  script: upload.py
+
+- url: /
+  static_dir: html
