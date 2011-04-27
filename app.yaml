@@ -10,5 +10,10 @@ handlers:
 - url: /stats
   script: upload.py
 
+- url: /(.+)
+  static_files: html/\1
+  upload: html/(.+)
+
+
 - url: /
-  static_dir: html
+  script: index.py
