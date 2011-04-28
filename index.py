@@ -15,7 +15,7 @@ class Index(webapp.RequestHandler):
                             input_encoding='utf8',
                             output_encoding='utf8')
 
-        output = template.render(kilometers=9999)
+        output = template.render(kilometers=23)
         self.response.out.write(output)
 
 application = webapp.WSGIApplication(
