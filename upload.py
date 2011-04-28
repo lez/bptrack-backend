@@ -44,8 +44,8 @@ class Upload(webapp.RequestHandler):
 
 class Stats(webapp.RequestHandler):
     def get(self):
-        totaldistance = random.randint(131,2836878)
-        totaltracks = random.randint(11,2878)
+        totaldistance = 23000
+        totaltracks = 127
         self.response.out.write('{"totalDistance":%d, "totalTracks":%d}' % (totaldistance, totaltracks))
 
 application = webapp.WSGIApplication(

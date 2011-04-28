@@ -9,7 +9,7 @@
         <link href='http://fonts.googleapis.com/css?family=Droid+Serif:regular,italic,bold&subset=latin' rel='stylesheet' type='text/css' />
 
         <style type="text/css" charset="utf-8">
-            body { margin:0; padding:0; background: #222; font-size:13px; font-family: Arial, Helvetica, sans-serif; color:#222; }
+            body { margin:0; padding:0; background: #222; font-size:13px; font-family: Helvetica,Arial, sans-serif; color:#222; }
 
             a, a:visited {color:#222; font-weight: bold; text-decoration: none;}
             a:hover {text-decoration: underline;}
@@ -43,7 +43,7 @@
             div.artists ul {list-style-type:circle; margin:0 0 13px 1.6em; padding:0;}
             div.artists ul li {margin-bottom: 3px; font-size: 15px;}
             span.source {font-size:15px; position:absolute; float:right; text-align:right;}
-            .headline {font-size: 1.5em; margin-bottom: 30px; text-align:left;}
+            .headline {font-size: 1.3em; margin-bottom: 30px; text-align:left;}
             .highlight{color:white; background:#42a7de; font-weight:bold; line-height:160%}
 
             .footer { clear:both; padding-top: 30px; width: 100%; text-align: center; margin-top: 40px; margin-bottom: 14px;}
@@ -62,8 +62,18 @@
             <div class="contents">
 
                 <div class="headline">
-                    Egy kezdeményezés melynek célja megmutatni, merre bringáznak a fővárosban. <br/><br/>
-                    Eddig feltöltött útvonalak hossza: <font style="color:crimson">${kilometers}</font> km.<br/>
+                    A Budapest Cycle Track egy kezdeményezés, melynek célja megmutatni, merre bringáznak a fővárosban.<br/><br/>
+
+                    Az Android és iPhone alkalmazásokkal önként és névtelenül feltöltheted a Budapest Cycle Track adatbázisba az általad tekert útvonalat,
+                    melyet később szabad felhasználásra bocsátunk.<br/><br/>
+
+                    Amint összejön a 10 000 km, az adatokból megrajzoljuk Budapest bringás forgalmi hőtérképét,
+                    így láthatóvá válik, hol van leginkább szükség bringautakra. <br/><br/>
+
+                    Ezenkívül lehetőséget adunk bárkinek, hogy saját vizualizációs algoritmust készítsen,
+                    és azt a Google szerverfarmján lefuttassa (cloud), majd az elkészült vizualizációt a honlapon közzétegye.<br/><br/>
+
+                    <strong>Eddig feltöltött útvonalak hossza: <font style="color:crimson">${kilometers}</font> km.</strong><br/>
                     <iframe src="http://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fbudapestcycletrack.appspot.com%2F&amp;send=true&amp;layout=standard&amp;width=450&amp;show_faces=true&amp;action=like&amp;colorscheme=light&amp;font&amp;height=25" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:450px; height:25px;" allowTransparency="true"></iframe>
 
                 </div>
