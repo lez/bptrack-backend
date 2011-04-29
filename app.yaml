@@ -10,6 +10,12 @@ handlers:
 - url: /stats
   script: upload.py
 
+- url: /marketplace
+  script: redirect.py
+
+- url: /appstore
+  script: redirect.py
+
 - url: /(.+)
   static_files: html/\1
   upload: html/(.+)
