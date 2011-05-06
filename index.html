@@ -16,15 +16,16 @@
 
             img.left {float:left; margin:0 0 1em 1em}
 
-            .main_wrapper {position:relative; width:620px; margin:0 auto; }
+            .main_wrapper {position:relative; width:990px; margin:0 auto; }
             .sidetext {color:#fff; font-size: 18px; text-align:center; margin-bottom:25px; padding: 6px; background: #800; border-radius:11px; -moz-border-radius: 11px; -webkit-border-radius: 11px;}
             .sidemobile {position:absolute; left: 440px; top:133px; display:block; border:0px;}
             .header { padding:35px 4px 10px; text-align: left; }
             .header img { margin:0; }
-            .contents { padding:25px 25px 14px; margin-bottom:25px; background: #fafafa; border-top: 1px solid #fff; border-radius:11px; -moz-border-radius: 11px; -webkit-border-radius: 11px;}
-
+            .contents { float: left; width:580px; padding:25px 25px 14px; margin-bottom:25px; background: #fafafa; border-top: 1px solid #fff; border-radius:11px; -moz-border-radius: 11px; -webkit-border-radius: 11px;}
+            .fb {float: right; width:292px; padding:25px 25px 14px; margin-bottom:25px; background: #fafafa; border-top: 1px solid #fff; border-radius:11px; -moz-border-radius: 11px; -webkit-border-radius: 11px;}
+            
             .header, .contents {}
-            .header {font-size: 10px; color: #fafafa; text-align: center; margin-bottom: 20px}
+            .header {font-size: 10px; color: #fafafa; text-align: center; margin-bottom: 20px;width:620px}
 
             .contents_header {overflow: hidden; margin-bottom:5px;}
             .event {margin-left: 90px;}
@@ -88,7 +89,12 @@
                     és azt a Google szerverfarmján lefuttassa (cloud), majd az elkészült vizualizációt a honlapon közzétegye.<br/><br/>
 
                     <strong>Eddig feltöltött útvonalak hossza: <font style="color:crimson">${kilometers}</font> km.</strong><br/>
-                    <iframe src="http://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fbudapestcycletrack.appspot.com%2F&amp;send=true&amp;layout=standard&amp;width=450&amp;show_faces=true&amp;action=like&amp;colorscheme=light&amp;font&amp;height=25" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:450px; height:25px;" allowTransparency="true"></iframe>
+                    <div id="fb-root"></div><script src="http://connect.facebook.net/en_US/all.js#xfbml=1"></script><fb:like href="http://www.facebook.com/BudapestCycleTrack" send="true" width="620" show_faces="false" font=""></fb:like>
+                    <table ><tr><td>
+                                <a href="http://twitter.com/bpcycletrack"><img style="width: 24px" src="img/twitterLogo.png"/></a>
+                            </td>
+                            <td> Megtalálhattok a Twitteren is.</td></tr>
+                    </table>
 
                 </div>
                 <div id="mobile_phones" style="height:440px;">
@@ -112,11 +118,16 @@
 
                     </div>
                 </div>
-                <div class="footer">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<!--                <div class="footer">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     <a href="http://twitter.com/bpcycletrack">twitter</a>&nbsp;&nbsp;&nbsp;
                     <a href="http://www.facebook.com/pages/Budapest-Cycle-Track/119936874753270">facebook</a>&nbsp;&nbsp;&nbsp;
-                </div>
+                </div>-->
             </div>
+            <div id="fb" class="fb">
+                <div id="fb-root"></div><script src="http://connect.facebook.net/en_US/all.js#xfbml=1"></script><fb:like-box href="http://www.facebook.com/BudapestCycleTrack" width="292" show_faces="true" stream="true" header="false"></fb:like-box>
+            </div>
+               
+            <div class="footer"></div>
         </div>
     </body></html>
 
