@@ -19,6 +19,9 @@ handlers:
 - url: /appstore
   script: redirect.py
 
+- url: /iphone_map
+  script: iphone_map.py
+
 - url: /(.+)
   static_files: html/\1
   upload: html/(.+)
@@ -26,3 +29,4 @@ handlers:
 
 - url: /
   script: index.py
+
