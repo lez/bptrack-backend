@@ -25,6 +25,15 @@ class Map(webapp.RequestHandler):
     def get(self):
         lat = 47.48414889179508
         lng = 19.059476852416992
+    
+        try:
+            if self.request.get('lat'):
+                lat = float(self.request.get('lat'))
+            if self.request.get('lng'):
+                lng = float(self.request.get('lng'))
+        except:
+            pass
+
 
         template = Template(filename="iphone_map.html",
                             input_encoding='utf8',

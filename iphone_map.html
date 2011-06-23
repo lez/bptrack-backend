@@ -5,10 +5,17 @@
     <head>
         <title>Budapest Cycle Track</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <style>
+            body {margin: 0px;}
+        </style>
     </head>
 
     <body>
-        <iframe width="300px" height="400px" scrolling="no"  src="http://www.google.com/fusiontables/embedviz?viz=MAP&q=select+col3+from+979332+&h=false&lat=${lat}&lng=${lng}&z=15&t=1&l=col3"></iframe>
+        <iframe id="map" width="100%" scrolling="no" src="http://www.google.com/fusiontables/embedviz?viz=MAP&q=select+col3+from+979332+&h=false&lat=${lat}&lng=${lng}&z=15&t=1&l=col3"></iframe>
+        <script type="text/javascript">
+            m = document.getElementById('map');
+            m.style.height = (window.innerHeight-30)+"px";
+        </script>
     </body>
 </html>
 
