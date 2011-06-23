@@ -1,0 +1,9 @@
+mapreduce:
+- name: convert_to_raw
+  mapper:
+    input_reader: mapreduce.input_readers.DatastoreInputReader
+    handler: mapfunctions.mr_convert_to_raw
+    params:
+    - name: entity_kind
+      default: upload.Track
+

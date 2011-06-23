@@ -11,10 +11,11 @@
     </head>
 
     <body>
-        <iframe id="map" width="100%" scrolling="no" src="http://www.google.com/fusiontables/embedviz?viz=MAP&q=select+col3+from+979332+&h=false&lat=${lat}&lng=${lng}&z=15&t=1&l=col3"></iframe>
+        <iframe id="map" scrolling="no" src="http://www.google.com/fusiontables/embedviz?viz=MAP&q=select+col3+from+979332+&h=false&lat=${lat}&lng=${lng}&z=15&t=1&l=col3"></iframe>
         <script type="text/javascript">
             m = document.getElementById('map');
-            m.style.height = (window.innerHeight-30)+"px";
+            m.style.height = (window.innerHeight-4)+"px";
+            m.style.width = (window.innerWidth-4)+"px";
         </script>
     </body>
 </html>
