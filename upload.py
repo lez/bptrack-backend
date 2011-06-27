@@ -1,5 +1,6 @@
 import datetime
 import logging
+import time
 import random
 from google.appengine.ext import db
 from google.appengine.ext import webapp
@@ -67,12 +68,34 @@ class Upload(webapp.RequestHandler):
 class Stats(webapp.RequestHandler):
     def get(self):
         dist = Counter.get_by_key_name('distance')
+#        if not dist:
+#            dist = Counter(key_name='distance', value=0)
+#            dist.put()
         totaldistance = dist.value
 
         number = Counter.get_by_key_name('number')
+#        if not number:
+#            number = Counter(key_name='number', value=0)
+#            number.put()
         totaltracks = number.value
 
-        self.response.out.write('{"totalDistance":%d, "totalTracks":%d}' % (totaldistance, totaltracks))
+        my_n = 0
+        my_m = 0
+        if self.request.get('uid'):
+            trk_q = db.GqlQuery("SELECT * FROM Track WHERE uuid='%s'" % self.request.get('uid'))
+            trks = trk_q.fetch(1000)
+            if not trks:
+                logging.warn('no tracks for this uid (yet)')
+
+            for trk in trks:
+                my_m += trk.distance
+                my_n += 1
+
+            self.response.out.write('{"totalDistance":%d, "totalTracks":%d, "myDistance":%d, "myTracks":%d}' % (totaldistance, totaltracks, my_m, my_n))
+
+
+        else:
+            self.response.out.write('{"totalDistance":%d, "totalTracks":%d}' % (totaldistance, totaltracks))
 
 class AndroidIphone(webapp.RequestHandler):
     def get(self):
@@ -141,9 +164,45 @@ class Kml(webapp.RequestHandler):
             for p in data['track']:
                 self.response.out.write("%f,%f\n" % (p['long'], p['lat']))
 
-            self.response.out.write("</coordinates></LineString></PlaceMark>")
+            self.response.out.write("</coordinates></LineString></Placemark>")
             
         self.response.out.write("</Document></kml>")
+
+class OldTracks(webapp.RequestHandler):
+    def get(self):
+        tracks = Track.all()
+        for t in tracks:
+            if not t.raw:
+                logging.info("Checking track %d" % t.key().id())
+                q = db.GqlQuery("SELECT * FROM Point WHERE ANCESTOR IS :1", t.key())
+
+                le_traq = []
+                for pt in q:
+                    unixtime = int(time.mktime(pt.ts.timetuple()))
+                    le_traq.append({"ts":unixtime, "lat":pt.lat, "long":pt.lng, "acc":pt.acc})
+
+                logging.info("Nr of points: %d" % len(le_traq))
+                self.response.out.write("nr of points: %d\n" % len(le_traq))
+
+                if len(le_traq) < 5:
+                    logging.info("Very short route. deleted.")
+                    self.response.out.write('deleted track %d' % t.key().id())
+                    t.delete()
+                    return
+
+                logging.info("encoding...")
+                encoder = json.JSONEncoder()
+                t.raw = encoder.encode({"track": le_traq, "distance":0, "uuid":t.uuid})
+
+                logging.info("Ok, writing back track")
+                t.put()
+
+                self.response.out.write('Track %d updated' %  t.key().id())
+                return
+                
+        self.response.out.write('FIN')
+
+
 
 
 
@@ -151,6 +210,7 @@ application = webapp.WSGIApplication(
                                      [('/upload', Upload),
                                       ('/stats/ai', AndroidIphone),
                                       ('/stats/kml', Kml),
+                                      ('/hello_old_tracks', OldTracks),
                                       ('/stats', Stats)],
                                      debug=True)
 

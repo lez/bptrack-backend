@@ -43,9 +43,27 @@ class Map(webapp.RequestHandler):
         self.response.out.write(output)
 
        
+class EmbedMap(webapp.RequestHandler):
+    def get(self):
+        h = self.request.get('height')
+        w = self.request.get('width')
+
+        if not h or not w:
+            self.response.out.write("A helyes url: http://budapestcycletrack.appspot.com/embed_map?height=400&width=400")
+            return
+    
+        template = Template(filename="embed_map.html",
+                            input_encoding='utf8',
+                            output_encoding='utf8')
+        
+        output = template.render(width=w,height=h)
+        self.response.out.write(output)
+
 
 application = webapp.WSGIApplication(
-                                     [('/iphone_map', Map)],
+                                     [('/iphone_map', Map),
+                                      ('/map', Map),
+                                      ('/embed_map', EmbedMap)],
                                      debug=True)
 
 def main():

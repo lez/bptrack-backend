@@ -370,6 +370,7 @@ class MapperSpec(JsonMixin):
       cached handler instance as callable.
     """
     if self.__handler is None:
+      logging.warn(self.handler_spec)
       resolved_spec = util.for_name(self.handler_spec)
       if isinstance(resolved_spec, type):
         # create new instance if this is type

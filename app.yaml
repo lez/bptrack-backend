@@ -13,6 +13,9 @@ handlers:
 - url: /stats/.*
   script: upload.py
 
+- url: /hello_old_tracks
+  script: upload.py
+
 - url: /marketplace
   script: redirect.py
 
@@ -22,11 +25,23 @@ handlers:
 - url: /iphone_map
   script: iphone_map.py
 
+- url: /map
+  script: iphone_map.py
+
+- url: /embed_map
+  script: iphone_map.py
+
+- url: /mapreduce(/.*)?
+  script: mapreduce/main.py
+  login: admin
+
+##################
+# maradek url-ek:
+##################
+
 - url: /(.+)
   static_files: html/\1
   upload: html/(.+)
 
-
 - url: /
   script: index.py
-
