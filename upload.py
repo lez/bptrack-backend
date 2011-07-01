@@ -99,7 +99,7 @@ class Stats(webapp.RequestHandler):
 
 class AndroidIphone(webapp.RequestHandler):
     def get(self):
-        tracks = Track.get_all()
+        tracks = Track.all()
         iphone = 0
         android = 0
         other = 0
@@ -110,18 +110,19 @@ class AndroidIphone(webapp.RequestHandler):
         android_devs = {}
         other_devs = {}
         for t in tracks:
-            if '-' in t.uuid:
-                other += 1
-                other_dist += t.distance
-                other_devs[t.uuid] = True
-            elif len(t.uuid) == 40:
-                iphone += 1
-                iphone_dist += t.distance
-                iphone_devs[t.uuid] = True
-            elif len(t.uuid) < 20 and len(t.uuid) > 0:
-                android += 1
-                android_dist += t.distance
-                android_devs[t.uuid] = True
+#            if t.uploadtime < datetime.datetime(2011,6,28):
+                if '-' in t.uuid:
+                    other += 1
+                    other_dist += t.distance
+                    other_devs[t.uuid] = True
+                elif len(t.uuid) == 40:
+                    iphone += 1
+                    iphone_dist += t.distance
+                    iphone_devs[t.uuid] = True
+                elif len(t.uuid) < 20 and len(t.uuid) > 0:
+                    android += 1
+                    android_dist += t.distance
+                    android_devs[t.uuid] = True
 
         self.response.out.write("iphone_dist: %d\n" % iphone_dist)
         self.response.out.write("android_dist: %d\n" % android_dist)

@@ -60,9 +60,30 @@ class EmbedMap(webapp.RequestHandler):
         self.response.out.write(output)
 
 
+class MapWithHeader(webapp.RequestHandler):
+    def get(self):
+        lat = 47.48414889179508
+        lng = 19.059476852416992
+    
+        try:
+            if self.request.get('lat'):
+                lat = float(self.request.get('lat'))
+            if self.request.get('lng'):
+                lng = float(self.request.get('lng'))
+        except:
+            pass
+
+
+        template = Template(filename="iphone_map_with_header.html",
+                            input_encoding='utf8',
+                            output_encoding='utf8')
+        
+        output = template.render(lat=lat,lng=lng)
+        self.response.out.write(output)
+
 application = webapp.WSGIApplication(
                                      [('/iphone_map', Map),
-                                      ('/map', Map),
+                                      ('/map', MapWithHeader),
                                       ('/embed_map', EmbedMap)],
                                      debug=True)
 

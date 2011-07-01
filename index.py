@@ -17,7 +17,12 @@ class Index(webapp.RequestHandler):
         
         distance = Counter.get_by_key_name('distance')
 
-        output = template.render(kilometers=distance.value/1000)
+        if not distance:
+            km = 0
+        else:
+            km = distance.value/1000
+
+        output = template.render(kilometers=km)
         self.response.out.write(output)
 
 application = webapp.WSGIApplication(

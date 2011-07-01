@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://opengraphprotocol.org/schema/"
+      xmlns:fb="http://www.facebook.com/2008/fbml">
+    <head>
+        <title>Budapest Cycle Track</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <style>
+            body {margin: 0px;}
+            .headline {font-size: 24px; margin-left:12px; float:center; margin-top:30px;}
+            #logo {margin: 5px; float:left;}
+            a {text-decoration: none;}
+            .idented {margin-left:12px;}
+        </style>
+        <script type="text/javascript">
+
+            var _gaq = _gaq || [];
+            _gaq.push(['_setAccount', 'UA-23038861-1']);
+            _gaq.push(['_trackPageview']);
+
+            (function() {
+                var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+            })();
+
+        </script>
+    </head>
+
+    <body>
+        <a href="/"><img id="logo" src="/img/bringa74.png" /><span class="headline">Budapest Cycle Track</span></a><br/>
+        <span class="idented">
+        <script src="http://connect.facebook.net/en_US/all.js#xfbml=1"></script><fb:like href="http://www.facebook.com/BudapestCycleTrack" send="true" width="620" show_faces="false" font=""></fb:like></span>
+        <iframe id="map" scrolling="no" src="http://www.google.com/fusiontables/embedviz?viz=MAP&q=select+col3+from+979332+&h=false&lat=${lat}&lng=${lng}&z=15&t=1&l=col3"></iframe>
+        <script type="text/javascript">
+            m = document.getElementById('map');
+            m.style.height = (window.innerHeight-4-74-20)+"px";
+            m.style.width = (window.innerWidth-4)+"px";
+        </script>
+    </body>
+</html>
+
