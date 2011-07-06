@@ -205,11 +205,45 @@ class OldTracks(webapp.RequestHandler):
 
 
 
+class Competition(webapp.RequestHandler):
+    def get(self):
+        tracks = Track.all()
+        tracks.filter("uploadtime >", datetime.datetime(2011,7,5))
+        iphone = 0
+        android = 0
+        other = 0
+        iphone_dist = 0
+        android_dist = 0
+        other_dist = 0
+        iphone_devs = {}
+        android_devs = {}
+        other_devs = {}
+        for t in tracks:
+            if '-' in t.uuid:
+                other += 1
+                other_dist += t.distance
+                other_devs[t.uuid] = True
+            elif len(t.uuid) == 40:
+                iphone += 1
+                iphone_dist += t.distance
+                iphone_devs[t.uuid] = True
+            elif len(t.uuid) < 20 and len(t.uuid) > 0:
+                android += 1
+                android_dist += t.distance
+                android_devs[t.uuid] = True
+
+        self.response.out.write("Tavolsag:\niphone: %d\n" % iphone_dist)
+        self.response.out.write("android_dist: %d\n" % android_dist)
+        self.response.out.write("-------\nEszkozok:\niphone: %d\n" % len(iphone_devs))
+        self.response.out.write("android: %d\n" % len(android_devs))
+        self.response.out.write("------\ntracks:\nandroid: %d\n" % android)
+        self.response.out.write("iphone: %d\n" % iphone)
 
 
 application = webapp.WSGIApplication(
                                      [('/upload', Upload),
                                       ('/stats/ai', AndroidIphone),
+                                      ('/stats/compo', Competition),
                                       ('/stats/kml', Kml),
                                       ('/hello_old_tracks', OldTracks),
                                       ('/stats', Stats)],
