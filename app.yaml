@@ -35,6 +35,10 @@ handlers:
   script: mapreduce/main.py
   login: admin
 
+- url: /apk
+  static_files: html/apk/index.html
+  upload: html
+
 ##################
 # maradek url-ek:
 ##################
