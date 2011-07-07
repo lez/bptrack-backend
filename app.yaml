@@ -39,6 +39,10 @@ handlers:
   static_files: html/apk/index.html
   upload: html
 
+- url: /apk/
+  static_files: html/apk/index.html
+  upload: html2
+
 ##################
 # maradek url-ek:
 ##################
