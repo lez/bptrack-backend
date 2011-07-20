@@ -12,7 +12,7 @@ curl "budapestcycletrack.appspot.com/stats/kml?cursor=start" >> $FILE
 OLD_SIZE="zero"
 for i in {1..199}; do
     curl "budapestcycletrack.appspot.com/stats/kml?cursor=more" >> $FILE
-    echo -ne "Tracks downloaded: "; grep "<Placemark>" | wc -l
+    echo -ne "Tracks downloaded: "; grep "<Placemark>" $FILE | wc -l
     NEW_SIZE=`ls -l $FILE|cut -d" " -f 5`
     if [ "$NEW_SIZE" = "$OLD_SIZE" ]; then
         echo "downloaded all."
