@@ -6,7 +6,7 @@ if [ $# -lt 1 ]; then
 fi
 FILE=$1
 
-echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\<kml xmlns=\"http://www.opengis.net/kml/2.2\"><Document>" > $FILE
+echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?><kml xmlns=\"http://www.opengis.net/kml/2.2\"><Document>" > $FILE
 echo "Opened $FILE for kml writing..."
 curl "budapestcycletrack.appspot.com/stats/kml?cursor=start" >> $FILE
 OLD_SIZE="zero"

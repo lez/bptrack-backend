@@ -19,6 +19,7 @@ class Track(db.Model):
     avg_acc = db.FloatProperty()
     max_diff = db.IntegerProperty()
     nr = db.IntegerProperty()
+    ok = db.BooleanProperty()
 
 #    @staticmethod
 #    def get_all(offset):
@@ -147,12 +148,12 @@ class Kml(webapp.RequestHandler):
             tracks = Track.get_by_id([int(id) for id in self.request.get('ids').split(',')])
         elif self.request.get('cursor'):
             tracks = Track.all()
-            tracks.filter("nr >", 40)
+            tracks.filter("ok =", True)
 
             if self.request.get('cursor') != 'start':
                 tracks.with_cursor(memcache.get('cursor'))
 
-            ttt = tracks.fetch(limit=50)
+            ttt = tracks.fetch(limit=60)
             logging.info("New cursor: " + tracks.cursor())
             memcache.set('cursor', tracks.cursor())
             tracks = ttt
@@ -176,6 +177,10 @@ class Kml(webapp.RequestHandler):
         for t in tracks:
             if t.raw is None:
                 logging.critical("Track illegal %d" % t.key().id())
+                continue
+
+            if not t.max_diff:
+                logging.critical("max diff not found [%d]" % t.key().id())
                 continue
 
 #            if not t.avg_dist or not t.avg_acc:
@@ -307,6 +312,8 @@ class Competition(webapp.RequestHandler):
     def get(self):
         tracks = Track.all()
         tracks.filter("uploadtime >", datetime.datetime(2011,7,5))
+        tracks.filter("uploadtime <", datetime.datetime(2011,7,12))
+        tracks.filter("ok =", True)
         iphone = 0
         android = 0
         other = 0
