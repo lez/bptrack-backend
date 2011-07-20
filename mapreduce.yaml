@@ -5,5 +5,5 @@ mapreduce:
     handler: mapfunctions.mr_convert_to_raw
     params:
     - name: entity_kind
-      default: None
+      default: upload.Track
 

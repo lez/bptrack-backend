@@ -1,32 +1,46 @@
 import time
 import logging
-from api.encoders import DATE_FORMAT
 from mapreduce import operation as op
-from google.appengine.ext import db
 from django.utils import simplejson as json
+import math
 
 def mr_convert_to_raw(track):
-    """get the Points and convert to Track.raw"""
-    if not track.raw:
-        logging.info('going for Track id=' + str(track.key().id()))
 
-        pts_query = db.gqlQuery("SELECT * FROM Point WHERE ANCESTOR IS :1 ORDER BY 'ts'", track.key())
-        pts = pts_query.all()
+    dec = json.JSONDecoder()
+    data = dec.decode(track.raw)
 
-        logging.info("track has %d points" % pts.count())
+    nr = 0
+    dist = 0
+    sum_acc = 0.0
+    prev_lat = None
+    prev_lng = None
+    max_diff = 0.0
 
-        if pts.count() < 2:
-            logging.info("Very short route. Should be deleted.")
-            return
+    for p in data['track']:
+        sum_acc += p['acc']
+        lat = p['lat']; lng = p['long']
+        if prev_lat and prev_lng:
+            lat_diff = math.fabs(lat-prev_lat)
+            lng_diff = math.fabs(lng-prev_lng)
+            diff = math.sqrt((lat_diff * 111111)**2 + (lng_diff*75500)**2)
+            if diff > max_diff:
+                max_diff = diff
 
-        le_traq = []
-        for pt in pts:
-            unixtime = int(time.mktime(pt.ts.timetuple()))
-            le_traq.append({"ts":unixtime, "lat":pt.lat, "long":pt.lng, "acc":pt.acc})
+            nr += 1
+            dist += diff
 
-        logging.info("encoding...")
-        encoder = json.JSONEncoder()
-        track.raw = encoder.encode({"track": le_traq, "distance":0, "uuid":track.uuid})
+        prev_lat = lat
+        prev_lng = lng
 
-        logging.info("Ok, writing back track")
-        yield op.db.Put(track)
+    track.nr = nr
+
+    if nr > 0:
+        track.avg_acc = float(sum_acc) / nr
+        track.avg_dist = float(dist) / nr
+        track.max_diff = int(max_diff)
+        logging.info("Enabled track w %d points: [%d]" % (track.nr, track.key().id()))
+
+    else:
+        logging.info("Disabled track %d" % track.key().id())
+        
+    yield op.db.Put(track)

@@ -7,16 +7,22 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from django.utils import simplejson as json
 from counter import Counter
+import math
+from google.appengine.api import memcache
 
 class Track(db.Model):
     uuid = db.StringProperty()
     uploadtime = db.DateTimeProperty()
     distance = db.IntegerProperty()
     raw = db.TextProperty()
+    avg_dist = db.FloatProperty()
+    avg_acc = db.FloatProperty()
+    max_diff = db.IntegerProperty()
+    nr = db.IntegerProperty()
 
-    @staticmethod
-    def get_all(offset):
-        return db.GqlQuery('SELECT * FROM Track LIMIT 100 OFFSET %s' % offset)
+#    @staticmethod
+#    def get_all(offset):
+#        return db.GqlQuery('SELECT * FROM Track LIMIT 100 OFFSET %s' % offset)
 
 class Point(db.Model):
     lat = db.FloatProperty()
@@ -136,38 +142,130 @@ class AndroidIphone(webapp.RequestHandler):
 
 class Kml(webapp.RequestHandler):
     def get(self):
-        tracks = Track.get_all(self.request.get('offset'))
+        dump_tracks = False
+        if self.request.get('ids'):
+            tracks = Track.get_by_id([int(id) for id in self.request.get('ids').split(',')])
+        elif self.request.get('cursor'):
+            tracks = Track.all()
+            tracks.filter("nr >", 40)
 
-        self.response.out.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\
-<kml xmlns=\"http://www.opengis.net/kml/2.2\">\
-<Document>")
+            if self.request.get('cursor') != 'start':
+                tracks.with_cursor(memcache.get('cursor'))
+
+            ttt = tracks.fetch(limit=50)
+            logging.info("New cursor: " + tracks.cursor())
+            memcache.set('cursor', tracks.cursor())
+            tracks = ttt
+        else:
+            """offset=123"""
+            tracks = Track.all()
+            tracks.filter("nr >", 40)
+            if self.request.get('limit'):
+                limit = int(self.request.get('limit'))
+                dump_tracks = True
+            else:
+                limit = 100
+
+            offset = int(self.request.get('offset'))
+            ttt = tracks.fetch(limit=limit, offset=offset)
+            logging.info("New cursor: " + tracks.cursor())
+            tracks = ttt
+
+        count = 0
+        dec = json.JSONDecoder()
+        for t in tracks:
+            if t.raw is None:
+                logging.critical("Track illegal %d" % t.key().id())
+                continue
+
+#            if not t.avg_dist or not t.avg_acc:
+#                continue
+#
+            if '-' in t.uuid:
+                logging.critical("Uid illegal %d" % t.key().id())
+                continue
+
+#            if len(t.uuid) == 40:
+#                type = 'iphone'
+#            elif len(t.uuid) < 20 and len(t.uuid) > 0:
+#                type = 'android'
+#            else:
+#                logging.critical('ehj')
+
+            self.response.out.write("<Placemark><ExtendedData>" +
+                                    "<Data name=\"avg_acc\"><displayName>avg_acc</displayName><value>%f</value></Data>" % t.avg_acc +
+                                    "<Data name=\"avg_dist\"><displayName>avg_dist</displayName><value>%f</value></Data>" % t.avg_dist +
+                                    "<Data name=\"max_diff\"><displayName>max_diff</displayName><value>%d</value></Data>" % t.max_diff +
+                                    "</ExtendedData><LineString><coordinates>" )
+
+            count += 1
+            if dump_tracks:
+                if t.avg_dist > 100 or t.max_diff > 100 or t.avg_acc > 50:
+                    logging.debug("Track [%d] - avg_dist=%f, max_diff=%d, avg_acc=%f" % (t.key().id(), t.avg_dist, t.max_diff, t.avg_acc))
+
+            data = dec.decode(t.raw)
+            for p in data['track']:
+                self.response.out.write("%f,%f\n" % (p['long'], p['lat']))
+
+            self.response.out.write("</coordinates></LineString></Placemark>\n")
+            
+        logging.info("processed %d tracks" % count)
+
+class Filter(webapp.RequestHandler):
+    def get(self):
+        tracks = Track.get_all(self.request.get('offset'))
 
         dec = json.JSONDecoder()
         for t in tracks:
             if t.raw is None:
                 continue
-                
+
             if '-' in t.uuid:
                 continue
 
-            if len(t.uuid) == 40:
-                type = 'iphone'
-            elif len(t.uuid) < 20 and len(t.uuid) > 0:
-                type = 'android'
-            else:
-                logging.critical('ehj')
-
-            self.response.out.write("<Placemark><name>0</name><ExtendedData><Data name=\"type\"><displayName>type</displayName><value>%s</value>" % type+
-                                    "</Data></ExtendedData><LineString><coordinates>" )
-
             data = dec.decode(t.raw)
-            logging.debug("%s", t.uuid)
-            for p in data['track']:
-                self.response.out.write("%f,%f\n" % (p['long'], p['lat']))
 
-            self.response.out.write("</coordinates></LineString></Placemark>")
-            
-        self.response.out.write("</Document></kml>")
+            dist = 0
+            prev_lat = None
+            prev_lng = None
+            max_diff = 0.0
+            nr = 0
+
+            sum_acc = 0
+
+            for p in data['track']:
+                if p['acc'] > 30:
+                    continue
+
+                sum_acc += p['acc']
+                lat = p['lat']; lng = p['long']
+                if prev_lat and prev_lng:
+                    lat_diff = math.fabs(lat-prev_lat)
+                    lng_diff = math.fabs(lng-prev_lng)
+                    diff = math.sqrt((lat_diff * 111111)**2 + (lng_diff*75500)**2)
+                    if diff > max_diff:
+                        max_diff = diff
+
+                    nr += 1
+                    dist += diff
+
+                prev_lat = lat
+                prev_lng = lng
+
+            if not nr:
+                continue
+                
+            avg_acc = sum_acc / float(nr)
+            avg_dist = float(dist) / float(nr)
+
+            t.avg_dist = avg_dist
+            t.avg_acc = float(avg_acc)
+            t.nr = nr
+            t.put()
+
+            if max_diff > 200:
+                self.response.out.write("[%d] Track distance: %d nr: %d - our distance: %d - max diff: %f - avg acc: %f - avg dist: %f\n" % (t.key().id(), data['distance'], nr, dist, max_diff, avg_acc, avg_dist))
+
 
 class OldTracks(webapp.RequestHandler):
     def get(self):
@@ -245,6 +343,7 @@ application = webapp.WSGIApplication(
                                       ('/stats/ai', AndroidIphone),
                                       ('/stats/compo', Competition),
                                       ('/stats/kml', Kml),
+                                      ('/stats/filter', Filter),
                                       ('/hello_old_tracks', OldTracks),
                                       ('/stats', Stats)],
                                      debug=True)
