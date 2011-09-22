@@ -153,7 +153,7 @@ class Kml(webapp.RequestHandler):
             if self.request.get('cursor') != 'start':
                 tracks.with_cursor(memcache.get('cursor'))
 
-            ttt = tracks.fetch(limit=60)
+            ttt = tracks.fetch(limit=20)
             logging.info("New cursor: " + tracks.cursor())
             memcache.set('cursor', tracks.cursor())
             tracks = ttt
@@ -307,6 +307,21 @@ class OldTracks(webapp.RequestHandler):
         self.response.out.write('FIN')
 
 
+class QR(webapp.RequestHandler):
+    def get(self):
+        useragent = self.request.headers['User-Agent']
+        if 'Android' in useragent:
+            loc = "market://search?q=pname:hu.budapestcycletrack"
+        elif 'iPhone' in useragent or 'Darwin' in useragent:
+            loc = "http://itunes.apple.com/hu/app/budapest-cycle-tracker/id433400907?mt=8"
+        else:
+            loc = "http://www.urbancyclr.com"
+
+        self.response.headers['Location'] = loc
+        self.response.set_status(301)
+        
+
+
 
 class Competition(webapp.RequestHandler):
     def get(self):
@@ -352,6 +367,7 @@ application = webapp.WSGIApplication(
                                       ('/stats/kml', Kml),
                                       ('/stats/filter', Filter),
                                       ('/hello_old_tracks', OldTracks),
+                                      ('/qr', QR),
                                       ('/stats', Stats)],
                                      debug=True)
 
